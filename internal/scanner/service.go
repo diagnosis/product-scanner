@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -25,15 +26,16 @@ func NewService(store Store, model AIModel) *Service {
 }
 
 var ErrInvalidModelReply = errors.New("scanner: invalid model reply")
+var ErrModelUnavailable = errors.New("scanner: model is not available")
 
 func (s *Service) Scan(ctx context.Context, input []byte) (*Product, error) {
 	reply, err := s.model.Extract(ctx, input)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrModelUnavailable, err)
 	}
 	var p *Product
 	if err = json.Unmarshal([]byte(reply), &p); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrInvalidModelReply, err)
 	}
 	if p == nil || strings.TrimSpace(p.Name) == "" {
 		return nil, ErrInvalidModelReply
