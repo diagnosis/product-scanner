@@ -33,13 +33,20 @@ func (s *Service) Scan(ctx context.Context, input []byte) (*Product, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrModelUnavailable, err)
 	}
-	var p *Product
-	if err = json.Unmarshal([]byte(reply), &p); err != nil {
+	var sp *ScannedProduct
+	if err = json.Unmarshal([]byte(reply), &sp); err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrInvalidModelReply, err)
 	}
-	if p == nil || strings.TrimSpace(p.Name) == "" {
+	if sp == nil || strings.TrimSpace(sp.Name) == "" {
 		return nil, ErrInvalidModelReply
 	}
+	p := &Product{
+		Category:  sp.Category,
+		Name:      sp.Name,
+		Weight:    sp.Weight,
+		Calories:  sp.Calories,
+	}
+
 	if err = s.store.Save(ctx, p); err != nil {
 		return nil, err
 	}

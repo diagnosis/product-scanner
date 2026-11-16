@@ -9,13 +9,15 @@ import (
 
 type fakeStore struct {
 	products map[uuid.UUID]Product
+	received Product
 }
 
 func newFakeStore() *fakeStore {
-	return &fakeStore{make(map[uuid.UUID]Product)}
+	return &fakeStore{products: make(map[uuid.UUID]Product)}
 }
 
 func (f *fakeStore) Save(ctx context.Context, product *Product) error {
+	f.received = *product
 	now := time.Now()
 	product.ID = uuid.New()
 	product.CreatedAt = now

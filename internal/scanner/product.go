@@ -15,3 +15,10 @@ type Product struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type ScannedProduct struct {
+	Category string  `json:"category"`
+	Name     string  `json:"name"`
+	Weight   *string `json:"weight"`
+	Calories *int    `json:"calories"`
+}
